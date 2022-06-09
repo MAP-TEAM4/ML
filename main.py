@@ -1,8 +1,16 @@
 from fastapi import FastAPI, File, UploadFile
 from elasticsearch import Elasticsearch
+from fastapi.middleware.cors import CORSMiddleware
 import easyocr
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -39,6 +47,7 @@ async def levenshtein_search(text):
 async def ocr(file: UploadFile):
     result = []
     reader = easyocr.Reader(['ko', 'en'])
+    print(file.filename)
     contents = await file.read()
     simple_results = reader.readtext(contents, detail=0)
     print(simple_results)
